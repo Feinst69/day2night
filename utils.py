@@ -1,8 +1,11 @@
+import os
 import torch
 import config
 from torchvision.utils import save_image
 
 def save_some_examples(gen, val_loader, epoch, folder):
+    # Make sure the destination folder exists so saving images does not fail.
+    os.makedirs(folder, exist_ok=True)
     x, y = next(iter(val_loader))
     x, y = x.to(config.DEVICE), y.to(config.DEVICE)
     gen.eval()
@@ -17,6 +20,10 @@ def save_some_examples(gen, val_loader, epoch, folder):
 
 
 def save_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
+    # Allow saving checkpoints to nested paths (e.g., "checkpoints/gen.pth.tar").
+    checkpoint_dir = os.path.dirname(filename)
+    if checkpoint_dir:
+        os.makedirs(checkpoint_dir, exist_ok=True)
     print("=> Saving checkpoint")
     checkpoint = {
         "state_dict": model.state_dict(),
